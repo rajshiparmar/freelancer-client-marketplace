@@ -185,26 +185,64 @@ public class ProjectService {
     // --------------------------------------------------------
     public void updateBidDecision(Long projectId, Long bidId, String status, String token) {
 
-        String url = "http://localhost:8082/freelancer/bids/" + bidId + "/status?status=" + status;
-
+        // -----------------------------
+        // 1. Update freelancer-ms status
+        // -----------------------------
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + token.replace("Bearer ", ""));
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
 
-        restTemplate.postForEntity(url, new HttpEntity<>(headers), Void.class);
+        restTemplate.postForEntity(
+                "http://localhost:8082/freelancer/bids/" + bidId + "/status?status=" + status,
+                entity,
+                Void.class
+        );
 
+        // -----------------------------
+        // 2. Determine assignment status
+        // -----------------------------
         AssignmentStatus assignStatus =
                 status.equalsIgnoreCase("ACCEPTED") ? AssignmentStatus.ASSIGNED :
                 status.equalsIgnoreCase("REJECTED") ? AssignmentStatus.REJECTED :
                 AssignmentStatus.PENDING;
 
-        ProjectAssignment assignment = ProjectAssignment.builder()
-                .projectId(projectId)
-                .freelancerId(bidId)
-                .status(assignStatus)
-                .build();
+        // -----------------------------
+        // 3. Fetch freelancerId from freelancer-MS
+        // -----------------------------
+        ResponseEntity<Map> bidResponse = restTemplate.exchange(
+            "http://localhost:8082/freelancer/bids/info/" + bidId,
+            HttpMethod.GET,
+            entity,
+            Map.class
+        );
+
+        Long freelancerId =
+                ((Number) bidResponse.getBody().get("freelancerId")).longValue();
+
+        // -----------------------------
+        // 4. Prevent duplicate assignment
+        // -----------------------------
+        Optional<ProjectAssignment> existing =
+                assignmentRepository.findByProjectIdAndFreelancerId(projectId, freelancerId);
+
+        ProjectAssignment assignment;
+
+        if (existing.isPresent()) {
+            // update existing assignment
+            assignment = existing.get();
+            assignment.setStatus(assignStatus);
+        } else {
+            // create new assignment
+            assignment = ProjectAssignment.builder()
+                    .projectId(projectId)
+                    .freelancerId(freelancerId)
+                    .status(assignStatus)
+                    .build();
+        }
 
         assignmentRepository.save(assignment);
     }
+
     
     // --------------------------------------------------------
     // GET ASSIGNMENT

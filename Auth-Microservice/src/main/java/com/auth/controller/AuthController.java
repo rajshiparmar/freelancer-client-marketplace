@@ -65,9 +65,6 @@ public class AuthController {
         logger.info("User registered successfully userId={} correlationId={}", 
                 user.getId(), MDC.get("correlationId"));
 
-        
-        String token = jwtHelper.generateToken(user);
-
         RegisterResponse response = new RegisterResponse(
                 "User registered successfully.",
                 user.getId()

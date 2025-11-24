@@ -71,6 +71,10 @@ public class ProjectController {
 		return ResponseEntity.ok(freelancerMatch);
 	}
 	
+	
+	/* OTHER API */
+	
+	
     // --------------------------------------------------------
     // GET MY PROJECTS (CLIENT)
     // --------------------------------------------------------
@@ -142,5 +146,10 @@ public class ProjectController {
 	            projectService.getAssignedProjects(client.getId(), token);
 
 	    return ResponseEntity.ok(list);
+	}
+	
+	@PostMapping("/clients")
+	public Client createClient(@RequestBody Client client) {
+	    return clientRepository.save(client);
 	}
 }

@@ -220,4 +220,16 @@ public class FreelancerService {
         return freelancerRepository.findById(id)
                 .orElseThrow(() -> new FreelancerNotFoundException("Freelancer not found with id=" + id));
     }
+    
+    public BidSummaryDTO getBidInfo(Long bidId) {
+        Bid bid = bidRepository.findById(bidId)
+                .orElseThrow(() -> new RuntimeException("Bid not found"));
+
+        BidSummaryDTO dto = new BidSummaryDTO();
+        dto.setBidId(bid.getId());
+        dto.setFreelancerId(bid.getFreelancer().getId());
+        dto.setProjectId(bid.getProjectId());
+        return dto;
+    }
+
 }

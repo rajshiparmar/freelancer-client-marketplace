@@ -14,6 +14,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.client.RestTemplate;
 import com.freelancer.jwt.JwtAuthenticationFilter;
 
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -27,25 +28,41 @@ public class SecurityConfig {
         http.cors().and().csrf().disable()
                 .authorizeHttpRequests(auth -> auth
 
-                        // Public
+                        // PUBLIC
                         .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/freelancer").permitAll()
 
+                        // -------------- CLIENT ONLY --------------
+                        // GET bids for project
+                        .requestMatchers(HttpMethod.GET, "/freelancer/bids/**")
+                                .hasAuthority("CLIENT")
 
-                     // CLIENT must match BEFORE freelancer wildcard rule
-                        .requestMatchers("/freelancer/skills/summary").hasAuthority("CLIENT")
-                        .requestMatchers("/freelancer/bids/**").hasAuthority("CLIENT")
+                        .requestMatchers("/freelancer/skills/summary")
+                                .hasAuthority("CLIENT")
 
-                        // Freelancer access
-                        .requestMatchers("/freelancer/getFreelancer").hasAuthority("FREELANCER")
-                        .requestMatchers("/freelancer/bids").hasAuthority("FREELANCER")
-                        .requestMatchers("/freelancer/my-bids").hasAuthority("FREELANCER")
-                        .requestMatchers("/freelancer/skills/**").hasAuthority("FREELANCER") 
+                        // update bid status
+                        .requestMatchers(HttpMethod.POST, "/freelancer/bids/*/status")
+                                .hasAuthority("CLIENT")
 
+                        // -------------- FREELANCER ONLY --------------
+                        // Add a bid
+                        .requestMatchers(HttpMethod.POST, "/freelancer/bids")
+                                .hasAuthority("FREELANCER")
 
+                        .requestMatchers("/freelancer/my-bids")
+                                .hasAuthority("FREELANCER")
+
+                        .requestMatchers("/freelancer/getFreelancer")
+                                .hasAuthority("FREELANCER")
+
+                        .requestMatchers("/freelancer/skills/**")
+                                .hasAuthority("FREELANCER")
+
+                        // BOTH can view freelancer profile
                         .requestMatchers(HttpMethod.GET, "/freelancer/*")
                                 .hasAnyAuthority("CLIENT", "FREELANCER")
 
+                        // any remaining must be authenticated
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -64,3 +81,5 @@ public class SecurityConfig {
         return new RestTemplate();
     }
 }
+
+

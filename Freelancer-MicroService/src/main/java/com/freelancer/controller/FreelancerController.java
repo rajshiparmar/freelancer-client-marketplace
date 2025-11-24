@@ -59,6 +59,13 @@ public class FreelancerController {
         logger.info("Fetching freelancer skills summary");
         return freelancerService.getSummary();
     }
+    
+    
+    
+    
+    
+    
+	/* OTHER API */
 
     // -------------------------------------------------------
     // POST: Create Freelancer (Called by Auth MS)
@@ -140,4 +147,10 @@ public class FreelancerController {
                     .body(Map.of("error", "Freelancer not found", "id", id));
         }
     }
+    
+    @GetMapping("/bids/info/{bidId}")
+    public BidSummaryDTO getBidInfo(@PathVariable Long bidId) {
+        return freelancerService.getBidInfo(bidId);
+    }
+
 }
