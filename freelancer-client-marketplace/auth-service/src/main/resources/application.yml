@@ -1,0 +1,33 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: AUTH-SERVICE
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/auth_microservice
+    username: root
+    password: RajshiMySql2024
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+jwt:
+  secrets: pX9bV2qLmC7dK8tR4eN5wS1jF6hG3zT8yQ9uA2rM5cJ7pL9dS3vW6bY8nQ4tU1k
+  expiration: 3600000
+
+logging:
+  config: classpath:logback-spring.xml
