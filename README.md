@@ -159,13 +159,11 @@ http://localhost:5173
 
 ---
 
-## 🎥 Video Explanation
+## 🎥 Project Video
 
-You can update with your video link later.
+Watch the full project walkthrough here:
 
-```
-[🔗 Click to Watch Full Project Walkthrough](YOUR_VIDEO_URL)
-```
+🔗 **https://drive.google.com/file/d/16ljF-AGPlUGRC75VjSer6AnIRStn8tDG/view?usp=drive_link**
 
 ---
 
